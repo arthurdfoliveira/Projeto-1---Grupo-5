@@ -11,7 +11,7 @@ pode ser utilizado por todos os públicos
 * 1 botão ON/OFF
 * 3 push buttons
 
-O jogo possui três push buttons principais, identificados com Braille e em  formato de seta na parte superior do jogo. Além desses três
+O jogo possui três push buttons principais, identificados com Braille e em  formato de seta, sendo a seta esquerda, frente e direita, na parte superfíce do jogo. Além desses três
 botões principais, ainda há um botão ON/OFF na face lateral do artefato. Após iniciado o jogo, um comando será ditado numa forma de 
 "tutorial sonoro", o que vai explicar como o jogo funcionará.
 
