@@ -8,12 +8,9 @@ as sequências e perguntas de acordo com a idade recomendada. No entanto, indepe
 pode ser utilizado por todos os públicos
 
 # Orientações de Uso
-* 1 botão ON/OFF
-* 3 push buttons
+* 3 botões principais
 
-O jogo possui três push buttons principais, identificados com Braille e em  formato de seta, sendo a seta esquerda, frente e direita, na parte superfíce do jogo. Além desses três
-botões principais, ainda há um botão ON/OFF na face lateral do artefato. Após iniciado o jogo, um comando será ditado numa forma de 
-"tutorial sonoro", o que vai explicar como o jogo funcionará.
+O jogo possui três botões principais, identificados com Braille e em  formato de seta, sendo a seta esquerda, frente e direita, na parte superfíce do jogo. Após iniciado o jogo, um comando será ditado numa forma de "tutorial sonoro", o que vai explicar como o jogo funcionará.
 
 O comando sonoro diz que o usuário deve escolher a matéria (Matemática, Ciências ou Conhecimentos Gerais) e selecionar a desejada de acordo 
 com seu respectivo botão. Após selecionar o tema, o usuário deve escolher a dificuldade recomendada das sequências e das perguntas, que será dividida em:
@@ -29,6 +26,14 @@ no tutorial sonoro.
 
 Depois do jogador acertar a sequência, a pergunta será emitida. Se o jogador acertar a pergunta, ele passa de fase e, consequentemente, a próxima sequência será 
 mais complexa, assim como a próxima pergunta e assim por diante, até o jogador chegar na pergunta final e ganhar. 
+
+# Componentes Utilizados
+* Arduino Uno
+* Módulo adaptador P2
+* Módulo MP3 dfplayer
+* 3x Botões push
+* Protoboard
+* Jumpers e resistores
 
 
 
