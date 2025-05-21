@@ -34,6 +34,13 @@ mais complexa, assim como a próxima pergunta e assim por diante, até o jogador
 * 3x Botões push
 * Protoboard
 * Jumpers e resistores
+* +++
+
+# Objetivos do Jogo
+* Estimular a memória auditiva e o raciocínio lógico
+* Reforçar conteúdos escolares de forma divertida, acessível e dinâmica
+* Promover a educação inclusiva para crianças cegas
+* Favorecer o desenvolvimento cognitivo e sensorial
 
 
 
