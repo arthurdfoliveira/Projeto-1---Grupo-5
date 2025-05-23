@@ -18,7 +18,7 @@ Veja o BrainPop! em ação:
 ## 🎮 Como Usar
 
 1. **Escolha o tema:** Pressione os botões para selecionar entre Matemática, Ciências ou Conhecimentos Gerais.
-2. **Defina a dificuldade:** Escolha entre:
+2. **Defina a dificuldade:**
    - 5 a 7 anos (Iniciante)
    - 8 a 10 anos (Intermediário)
    - 11 a 13 anos (Avançado)
@@ -46,6 +46,13 @@ Este jogo foi desenvolvido utilizando:
 
 ## 👨‍💻 Autores & Créditos
 
-- **Nome do Autor** - _Desenvolvedor do projeto_ | [LinkedIn](https://linkedin.com/)
-- **Colaborador X** - _Contribuições e melhorias_ | [GitHub](https://github.com/)
-
+- **Antonio Manoel Silva Lopes Gama** | [LinkedIn](https://linkedin.com/)
+- **Arthur da Fonte de Oliveira** | [LinkedIn]()
+- **Bernardo Martins da Costa Pinto Filho** | [LinkedIn]()
+- **Filipe Correia Santos** | [LinkedIn]()
+- **Gabriel Bezerra França Ribeiro** | [LinkedIn]()
+- **Giovanna Figueiredo de Azevedo** | [LinkedIn]()
+- **João Pedro Patriota de Carvalho** | [LinkedIn]()
+- **Lucas Gabriel da Silva** | [LinkedIn]()
+- **Manuela de Oliveira Nogueira** | [LinkedIn]()
+- **Walter Maia Santiago Neto** | [LinkedIn]()
