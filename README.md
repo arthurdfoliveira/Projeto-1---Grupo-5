@@ -46,13 +46,13 @@ Este jogo foi desenvolvido utilizando:
 
 ## 👨‍💻 Autores & Créditos
 
-- **Antonio Manoel Silva Lopes Gama** | [LinkedIn](https://linkedin.com/)
-- **Arthur da Fonte de Oliveira** | [LinkedIn]()
-- **Bernardo Martins da Costa Pinto Filho** | [LinkedIn]()
+- **Antonio Manoel Silva Lopes Gama** | [LinkedIn]()
+- **Arthur da Fonte de Oliveira** | [LinkedIn](http://www.linkedin.com/in/arthur-da-fonte-de-oliveira-884496363)
+- **Bernardo Martins da Costa Pinto Filho** | [LinkedIn](https://www.linkedin.com/in/bernardo-martins-069b6b355/)
 - **Filipe Correia Santos** | [LinkedIn]()
 - **Gabriel Bezerra França Ribeiro** | [LinkedIn]()
 - **Giovanna Figueiredo de Azevedo** | [LinkedIn]()
 - **João Pedro Patriota de Carvalho** | [LinkedIn]()
-- **Lucas Gabriel da Silva** | [LinkedIn]()
-- **Manuela de Oliveira Nogueira** | [LinkedIn]()
+- **Lucas Gabriel da Silva** | [LinkedIn](https://www.linkedin.com/in/lucas-gabriel-1005a2367?trk=contact-info)
+- **Manuela de Oliveira Nogueira** | [LinkedIn](https://www.linkedin.com/in/manuela-nogueira-30045a359?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
 - **Walter Maia Santiago Neto** | [LinkedIn]()
