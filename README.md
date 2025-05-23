@@ -5,12 +5,12 @@ Programado com o Arduíno Uno, o BrainPop! mistura componentes físicos e digita
 os usuários - que não precisam ser necessariamente deficientes visuais - com sequências sonoras e perguntas temáticas
 (Matemática, Ciências e Conhecimentos Gerais). O jogo possui como público-alvo crianças e jovens e disponibiliza
 as sequências e perguntas de acordo com a idade recomendada. No entanto, independentemente da recomendação, o jogo
-pode ser utilizado por todos os públicos
+pode ser utilizado por todos os públicos.
 
 # Orientações de Uso
 * 3 botões principais
 
-O jogo possui três botões principais, identificados com Braille e em  formato de seta, sendo a seta esquerda, frente e direita, na parte superfíce do jogo. Após iniciado o jogo, um comando será ditado numa forma de "tutorial sonoro", o que vai explicar como o jogo funcionará.
+O jogo possui três botões principais, identificados com Braille e em formato de seta, sendo a seta esquerda, frente e direita, na parte superfíce do jogo. Após iniciado o jogo, um comando será ditado numa forma de "tutorial sonoro", o que vai explicar como ele funcionará.
 
 O comando sonoro diz que o usuário deve escolher a matéria (Matemática, Ciências ou Conhecimentos Gerais) e selecionar a desejada de acordo 
 com seu respectivo botão. Após selecionar o tema, o usuário deve escolher a dificuldade recomendada das sequências e das perguntas, que será dividida em:
