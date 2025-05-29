@@ -30,7 +30,7 @@ mais complexa, assim como a próxima pergunta e assim por diante, até o jogador
 # Componentes Utilizados
 * Arduino Uno
 * Módulo adaptador P2
-* Módulo MP3 dfplayer
+* Módulo MP3 DFPlayer mini
 * 3x Botões push
 * Protoboard
 * Jumpers e resistores
