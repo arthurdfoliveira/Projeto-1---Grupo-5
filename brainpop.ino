@@ -1,209 +1,158 @@
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 
-const int BOTAO_A = 7;
-const int BOTAO_B = 6;
-const int BOTAO_C = 5;
-const int RX_PIN = 10;
-const int TX_PIN = 11;
+// ← CORREÇÃO AQUI: pinos onde seus botões estão realmente conectados
+#define BOTAO_A 7
+#define BOTAO_B 6
+#define BOTAO_C 5
 
-SoftwareSerial mySoftwareSerial(RX_PIN, TX_PIN);
-DFRobotDFPlayerMini myDFPlayer;
+SoftwareSerial mySerial(10, 11); // RX, TX do DFPlayer
+DFRobotDFPlayerMini player;
 
-enum EstadoJogo {
-  INICIO,
-  SELECAO_MATERIA,
-  SELECAO_DIFICULDADE,
-  SEQUENCIA,
-  RESPOSTA,
-  PERGUNTA,
-  FIM
+int estado = 0;
+int materiaSelecionada = 0;
+int dificuldadeSelecionada = 0;
+int perguntaAtual = 0;
+
+// Gabarito com 90 respostas (1=A, 2=B, 3=C)
+int respostasCorretas[90] = {
+  1,2,3,1,2,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3,
+  1,1,2,2,3,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3,
+  1,2,3,1,2,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3
 };
 
-EstadoJogo estadoAtual = INICIO;
-int sequencia[10];
-int posicaoAtual = 0;
-int materiaSelecionada = 0;  // 1-Matemática, 2-Ciências, 3-Conhecimentos Gerais
-int dificuldadeSelecionada = 0;  // 1-Fácil, 2-Médio, 3-Difícil
-int perguntaAtual = 0;
-int acertosConsecutivos = 0;
-
 void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+
   pinMode(BOTAO_A, INPUT_PULLUP);
   pinMode(BOTAO_B, INPUT_PULLUP);
   pinMode(BOTAO_C, INPUT_PULLUP);
 
-  Serial.begin(9600);
-  mySoftwareSerial.begin(9600);
-
-  if (!myDFPlayer.begin(mySoftwareSerial)) {
-    Serial.println("Erro ao inicializar DFPlayer Mini!");
-    while(true);
+  if (!player.begin(mySerial)) {
+    Serial.println("Falha ao inicializar o DFPlayer");
+    while (true);
   }
+  player.setTimeOut(500);
+  player.volume(20);
 
-  myDFPlayer.volume(20);
-  myDFPlayer.play(1); // Boas-vindas
-  delay(2000);
+  Serial.println("Iniciando o jogo...");
+  player.play(1); // 0001.mp3 - Boas-vindas
+  delay(43000);
+  estado = 1;
 }
 
 void loop() {
-  switch (estadoAtual) {
-    case INICIO:
-      if (botaoPressionado()) {
-        estadoAtual = SELECAO_MATERIA;
-        tocarInstrucoesMateria();
-      }
+  switch (estado) {
+    case 1: // instruções de matéria
+      Serial.println("Tocando instruções para escolher a matéria...");
+      player.play(2); // 0002.mp3
+      delay(24000);
+      estado = 2;
       break;
 
-    case SELECAO_MATERIA:
-      if (digitalRead(BOTAO_A) == LOW) {
-        materiaSelecionada = 1;
-        estadoAtual = SELECAO_DIFICULDADE;
-        tocarInstrucoesDificuldade();
-      } else if (digitalRead(BOTAO_B) == LOW) {
-        materiaSelecionada = 2;
-        estadoAtual = SELECAO_DIFICULDADE;
-        tocarInstrucoesDificuldade();
-      } else if (digitalRead(BOTAO_C) == LOW) {
-        materiaSelecionada = 3;
-        estadoAtual = SELECAO_DIFICULDADE;
-        tocarInstrucoesDificuldade();
-      }
+    case 2: // seleciona matéria
+      Serial.println("Esperando seleção da matéria...");
+      if (botaoPressionado(BOTAO_A))  escolhaMateria(1, 11, "Matemática");
+      else if (botaoPressionado(BOTAO_B)) escolhaMateria(2, 12, "Ciências");
+      else if (botaoPressionado(BOTAO_C)) escolhaMateria(3, 13, "Conhecimentos Gerais");
       break;
 
-    case SELECAO_DIFICULDADE:
-      if (digitalRead(BOTAO_A) == LOW) {
-        dificuldadeSelecionada = 1;
-        estadoAtual = SEQUENCIA;
-        perguntaAtual = 0;
-        gerarSequencia();
-      } else if (digitalRead(BOTAO_B) == LOW) {
-        dificuldadeSelecionada = 2;
-        estadoAtual = SEQUENCIA;
-        perguntaAtual = 0;
-        gerarSequencia();
-      } else if (digitalRead(BOTAO_C) == LOW) {
-        dificuldadeSelecionada = 3;
-        estadoAtual = SEQUENCIA;
-        perguntaAtual = 0;
-        gerarSequencia();
-      }
+    case 3: // instruções de dificuldade
+      Serial.println("Tocando instruções para escolher dificuldade...");
+      player.play(3); // 0003.mp3
+      delay(24000);
+      estado = 4;
       break;
 
-    case SEQUENCIA:
-      reproduzirSequencia();
-      estadoAtual = RESPOSTA;
+    case 4: // seleciona dificuldade
+      Serial.println("Esperando seleção da dificuldade...");
+      if (botaoPressionado(BOTAO_A))  escolhaDificuldade(1, 11, "Fácil");
+      else if (botaoPressionado(BOTAO_B)) escolhaDificuldade(2, 12, "Média");
+      else if (botaoPressionado(BOTAO_C)) escolhaDificuldade(3, 13, "Difícil");
       break;
 
-    case RESPOSTA:
-      if (verificarResposta()) {
-        estadoAtual = PERGUNTA;
-        tocarPergunta();
-      }
-      break;
-
-    case PERGUNTA:
-      if (verificarRespostaPergunta()) {
-        acertosConsecutivos++;
-        perguntaAtual++;
-
-        if (perguntaAtual >= 10) {
-          estadoAtual = FIM;
-          tocarVitoria();
-        } else {
-          estadoAtual = SEQUENCIA;
-          gerarSequencia();
-        }
+    case 5: // toca pergunta
+      if (perguntaAtual < 10) {
+        int idx = (materiaSelecionada - 1)*30 + (dificuldadeSelecionada - 1)*10 + perguntaAtual;
+        int faixa = 40 + idx;
+        Serial.print("Tocando pergunta ");
+        Serial.print(perguntaAtual + 1);
+        Serial.print(" (faixa ");
+        Serial.print(faixa);
+        Serial.println(")");
+        player.play(faixa);
+        delay(10000); // tempo para áudio da pergunta
+        estado = 6;
       } else {
-        tocarErro();
-        delay(2000);
-        reiniciarJogo();
+        Serial.println("Todas as perguntas concluídas!");
+        player.play(31); // vitória
+        delay(3000);
+        estado = 7;
       }
       break;
 
-    case FIM:
-      if (botaoPressionado()) {
-        reiniciarJogo();
-      }
+    case 6: // espera resposta
+      Serial.println("Esperando resposta...");
+      if (botaoPressionado(BOTAO_A)) verificaResposta(1);
+      else if (botaoPressionado(BOTAO_B)) verificaResposta(2);
+      else if (botaoPressionado(BOTAO_C)) verificaResposta(3);
+      break;
+
+    case 7: // fim / reinício
+      Serial.println("Jogo encerrado. Reiniciando...");
+      perguntaAtual = 0;
+      estado = 1;
       break;
   }
 }
 
-bool botaoPressionado() {
-  return digitalRead(BOTAO_A) == LOW || digitalRead(BOTAO_B) == LOW || digitalRead(BOTAO_C) == LOW;
+void escolhaMateria(int mat, int somBotao, const char* nome) {
+  materiaSelecionada = mat;
+  player.play(somBotao);
+  delay(1000);
+  Serial.print("Matéria escolhida: ");
+  Serial.println(nome);
+  estado = 3;
 }
 
-void tocarInstrucoesMateria() {
-  myDFPlayer.play(2); // Áudio com instruções para selecionar matéria
+void escolhaDificuldade(int dif, int somBotao, const char* nome) {
+  dificuldadeSelecionada = dif;
+  player.play(somBotao);
+  delay(1000);
+  Serial.print("Dificuldade: ");
+  Serial.println(nome);
+  perguntaAtual = 0;
+  estado = 5;
 }
 
-void tocarInstrucoesDificuldade() {
-  myDFPlayer.play(3); // Áudio com instruções para selecionar dificuldade
-}
-
-void gerarSequencia() {
-  int tamanho = 3 + (dificuldadeSelecionada - 1);
-  for (int i = 0; i < tamanho; i++) {
-    sequencia[i] = random(1, 4);
+void verificaResposta(int resp) {
+  int idx = (materiaSelecionada - 1)*30 + (dificuldadeSelecionada - 1)*10 + perguntaAtual;
+  Serial.print("Resposta recebida: ");
+  Serial.println(resp);
+  Serial.print("Resposta correta: ");
+  Serial.println(respostasCorretas[idx]);
+  if (resp == respostasCorretas[idx]) {
+    Serial.println("Resposta correta!");
+    perguntaAtual++;
+    estado = 5;
+  } else {
+    Serial.println("Resposta incorreta!");
+    player.play(30); // erro
+    delay(3000);
+    estado = 6;
   }
-  posicaoAtual = 0;
 }
 
-void reproduzirSequencia() {
-  int tamanho = 3 + (dificuldadeSelecionada - 1);
-  for (int i = 0; i < tamanho; i++) {
-    myDFPlayer.play(10 + sequencia[i]); // Sons: 11, 12, 13
-    delay(1000);
-  }
-}
-
-bool verificarResposta() {
-  int tamanho = 3 + (dificuldadeSelecionada - 1);
-  while (posicaoAtual < tamanho) {
-    int botao = esperarBotao();
-    if (botao == sequencia[posicaoAtual]) {
-      posicaoAtual++;
-    } else {
-      return false;
+// debounce + espera soltar
+bool botaoPressionado(int pino) {
+  if (digitalRead(pino) == LOW) {
+    delay(20);
+    if (digitalRead(pino) == LOW) {
+      while (digitalRead(pino) == LOW);
+      delay(20);
+      return true;
     }
   }
-  return true;
-}
-
-int esperarBotao() {
-  while (true) {
-    if (digitalRead(BOTAO_A) == LOW) return 1;
-    if (digitalRead(BOTAO_B) == LOW) return 2;
-    if (digitalRead(BOTAO_C) == LOW) return 3;
-    delay(50);
-  }
-}
-
-void tocarPergunta() {
-  int base = 40;  // Arquivo 40 em diante
-  int index = (materiaSelecionada - 1) * 30 + (dificuldadeSelecionada - 1) * 10 + perguntaAtual;
-  myDFPlayer.play(base + index);  // Ex: 40 a 129
-}
-
-bool verificarRespostaPergunta() {
-  int respostaCorreta = 1; // Suporte futuro: leitura de gabarito por índice
-  int resposta = esperarBotao();
-  return resposta == respostaCorreta;
-}
-
-void tocarErro() {
-  myDFPlayer.play(30);
-}
-
-void tocarVitoria() {
-  myDFPlayer.play(31);
-}
-
-void reiniciarJogo() {
-  estadoAtual = INICIO;
-  materiaSelecionada = 0;
-  dificuldadeSelecionada = 0;
-  perguntaAtual = 0;
-  acertosConsecutivos = 0;
-  tocarInstrucoesMateria();
+  return false;
 }
