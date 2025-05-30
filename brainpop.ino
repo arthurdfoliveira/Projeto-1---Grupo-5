@@ -1,20 +1,15 @@
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 
-// Definição dos pinos dos botões
-const int BOTAO_A = 2;  // Botão esquerdo
-const int BOTAO_B = 3;  // Botão central
-const int BOTAO_C = 4;  // Botão direito
-
-// Definição dos pinos para o DFPlayer Mini
+const int BOTAO_A = 7;
+const int BOTAO_B = 6;
+const int BOTAO_C = 5;
 const int RX_PIN = 10;
 const int TX_PIN = 11;
 
-// Variáveis globais
 SoftwareSerial mySoftwareSerial(RX_PIN, TX_PIN);
 DFRobotDFPlayerMini myDFPlayer;
 
-// Estados do jogo
 enum EstadoJogo {
   INICIO,
   SELECAO_MATERIA,
@@ -26,38 +21,28 @@ enum EstadoJogo {
 };
 
 EstadoJogo estadoAtual = INICIO;
-int sequencia[10];  // Array para armazenar a sequência
-int nivelAtual = 0;
+int sequencia[10];
 int posicaoAtual = 0;
 int materiaSelecionada = 0;  // 1-Matemática, 2-Ciências, 3-Conhecimentos Gerais
 int dificuldadeSelecionada = 0;  // 1-Fácil, 2-Médio, 3-Difícil
+int perguntaAtual = 0;
+int acertosConsecutivos = 0;
 
 void setup() {
-  // Inicialização dos botões
   pinMode(BOTAO_A, INPUT_PULLUP);
   pinMode(BOTAO_B, INPUT_PULLUP);
   pinMode(BOTAO_C, INPUT_PULLUP);
-  
-  // Inicialização da comunicação serial
+
   Serial.begin(9600);
   mySoftwareSerial.begin(9600);
-  
-  // Inicialização do DFPlayer Mini com verificação
-  Serial.println("Iniciando DFPlayer Mini...");
+
   if (!myDFPlayer.begin(mySoftwareSerial)) {
     Serial.println("Erro ao inicializar DFPlayer Mini!");
-    Serial.println("1. Verifique as conexões");
-    Serial.println("2. Verifique se o cartão SD está inserido");
-    Serial.println("3. Verifique se os arquivos estão numerados corretamente (0001.mp3, 0002.mp3, etc)");
     while(true);
   }
-  
-  Serial.println("DFPlayer Mini inicializado com sucesso!");
-  myDFPlayer.volume(20);  // Volume inicial (0-30)
-  
-  // Teste inicial do áudio
-  Serial.println("Testando áudio...");
-  myDFPlayer.play(1);  // Arquivo 1 deve ser a mensagem de boas-vindas
+
+  myDFPlayer.volume(20);
+  myDFPlayer.play(1); // Boas-vindas
   delay(2000);
 }
 
@@ -69,68 +54,73 @@ void loop() {
         tocarInstrucoesMateria();
       }
       break;
-      
+
     case SELECAO_MATERIA:
       if (digitalRead(BOTAO_A) == LOW) {
-        materiaSelecionada = 1;  // Matemática
+        materiaSelecionada = 1;
         estadoAtual = SELECAO_DIFICULDADE;
         tocarInstrucoesDificuldade();
-      }
-      else if (digitalRead(BOTAO_B) == LOW) {
-        materiaSelecionada = 2;  // Ciências
+      } else if (digitalRead(BOTAO_B) == LOW) {
+        materiaSelecionada = 2;
         estadoAtual = SELECAO_DIFICULDADE;
         tocarInstrucoesDificuldade();
-      }
-      else if (digitalRead(BOTAO_C) == LOW) {
-        materiaSelecionada = 3;  // Conhecimentos Gerais
+      } else if (digitalRead(BOTAO_C) == LOW) {
+        materiaSelecionada = 3;
         estadoAtual = SELECAO_DIFICULDADE;
         tocarInstrucoesDificuldade();
       }
       break;
-      
+
     case SELECAO_DIFICULDADE:
       if (digitalRead(BOTAO_A) == LOW) {
-        dificuldadeSelecionada = 1;  // Fácil (5-7 anos)
+        dificuldadeSelecionada = 1;
         estadoAtual = SEQUENCIA;
+        perguntaAtual = 0;
         gerarSequencia();
-      }
-      else if (digitalRead(BOTAO_B) == LOW) {
-        dificuldadeSelecionada = 2;  // Médio (8-10 anos)
+      } else if (digitalRead(BOTAO_B) == LOW) {
+        dificuldadeSelecionada = 2;
         estadoAtual = SEQUENCIA;
+        perguntaAtual = 0;
         gerarSequencia();
-      }
-      else if (digitalRead(BOTAO_C) == LOW) {
-        dificuldadeSelecionada = 3;  // Difícil (10-12 anos)
+      } else if (digitalRead(BOTAO_C) == LOW) {
+        dificuldadeSelecionada = 3;
         estadoAtual = SEQUENCIA;
+        perguntaAtual = 0;
         gerarSequencia();
       }
       break;
-      
+
     case SEQUENCIA:
       reproduzirSequencia();
       estadoAtual = RESPOSTA;
       break;
-      
+
     case RESPOSTA:
       if (verificarResposta()) {
         estadoAtual = PERGUNTA;
         tocarPergunta();
       }
       break;
-      
+
     case PERGUNTA:
       if (verificarRespostaPergunta()) {
-        nivelAtual++;
-        if (nivelAtual >= 5) {  // Jogo completo após 5 níveis
+        acertosConsecutivos++;
+        perguntaAtual++;
+
+        if (perguntaAtual >= 10) {
           estadoAtual = FIM;
           tocarVitoria();
         } else {
           estadoAtual = SEQUENCIA;
           gerarSequencia();
         }
+      } else {
+        tocarErro();
+        delay(2000);
+        reiniciarJogo();
       }
       break;
-      
+
     case FIM:
       if (botaoPressionado()) {
         reiniciarJogo();
@@ -140,87 +130,80 @@ void loop() {
 }
 
 bool botaoPressionado() {
-  return (digitalRead(BOTAO_A) == LOW || 
-          digitalRead(BOTAO_B) == LOW || 
-          digitalRead(BOTAO_C) == LOW);
+  return digitalRead(BOTAO_A) == LOW || digitalRead(BOTAO_B) == LOW || digitalRead(BOTAO_C) == LOW;
 }
 
 void tocarInstrucoesMateria() {
-  myDFPlayer.play(2);  // Arquivo 2 deve conter as instruções de seleção de matéria
+  myDFPlayer.play(2); // Áudio com instruções para selecionar matéria
 }
 
 void tocarInstrucoesDificuldade() {
-  myDFPlayer.play(3);  // Arquivo 3 deve conter as instruções de seleção de dificuldade
+  myDFPlayer.play(3); // Áudio com instruções para selecionar dificuldade
 }
 
 void gerarSequencia() {
-  for (int i = 0; i <= nivelAtual; i++) {
-    sequencia[i] = random(1, 4);  // 1-A, 2-B, 3-C
+  int tamanho = 3 + (dificuldadeSelecionada - 1);
+  for (int i = 0; i < tamanho; i++) {
+    sequencia[i] = random(1, 4);
   }
   posicaoAtual = 0;
 }
 
 void reproduzirSequencia() {
-  for (int i = 0; i <= nivelAtual; i++) {
-    myDFPlayer.play(10 + sequencia[i]);  // Arquivos 11, 12, 13 devem ser os sons dos botões
+  int tamanho = 3 + (dificuldadeSelecionada - 1);
+  for (int i = 0; i < tamanho; i++) {
+    myDFPlayer.play(10 + sequencia[i]); // Sons: 11, 12, 13
     delay(1000);
   }
 }
 
 bool verificarResposta() {
-  int botaoPressionado = 0;
-  
-  while (botaoPressionado == 0) {
-    if (digitalRead(BOTAO_A) == LOW) botaoPressionado = 1;
-    else if (digitalRead(BOTAO_B) == LOW) botaoPressionado = 2;
-    else if (digitalRead(BOTAO_C) == LOW) botaoPressionado = 3;
-  }
-  
-  if (botaoPressionado == sequencia[posicaoAtual]) {
-    posicaoAtual++;
-    if (posicaoAtual > nivelAtual) {
-      return true;
+  int tamanho = 3 + (dificuldadeSelecionada - 1);
+  while (posicaoAtual < tamanho) {
+    int botao = esperarBotao();
+    if (botao == sequencia[posicaoAtual]) {
+      posicaoAtual++;
+    } else {
+      return false;
     }
-  } else {
-    tocarErro();
-    delay(2000);
-    reiniciarJogo();
   }
-  return false;
+  return true;
+}
+
+int esperarBotao() {
+  while (true) {
+    if (digitalRead(BOTAO_A) == LOW) return 1;
+    if (digitalRead(BOTAO_B) == LOW) return 2;
+    if (digitalRead(BOTAO_C) == LOW) return 3;
+    delay(50);
+  }
 }
 
 void tocarPergunta() {
-  // Tocar pergunta baseada na matéria e dificuldade selecionadas
-  int arquivoPergunta = 20 + (materiaSelecionada - 1) * 3 + (dificuldadeSelecionada - 1);
-  myDFPlayer.play(arquivoPergunta);
+  int base = 40;  // Arquivo 40 em diante
+  int index = (materiaSelecionada - 1) * 30 + (dificuldadeSelecionada - 1) * 10 + perguntaAtual;
+  myDFPlayer.play(base + index);  // Ex: 40 a 129
 }
 
 bool verificarRespostaPergunta() {
-  int botaoPressionado = 0;
-  
-  while (botaoPressionado == 0) {
-    if (digitalRead(BOTAO_A) == LOW) botaoPressionado = 1;
-    else if (digitalRead(BOTAO_B) == LOW) botaoPressionado = 2;
-    else if (digitalRead(BOTAO_C) == LOW) botaoPressionado = 3;
-  }
-  
-  // Aqui você precisará implementar a lógica para verificar se a resposta está correta
-  // baseado na pergunta atual e na resposta correta
-  return true;  // Temporariamente retorna sempre verdadeiro
+  int respostaCorreta = 1; // Suporte futuro: leitura de gabarito por índice
+  int resposta = esperarBotao();
+  return resposta == respostaCorreta;
 }
 
 void tocarErro() {
-  myDFPlayer.play(30);  // Arquivo 30 deve ser o som de erro
+  myDFPlayer.play(30);
 }
 
 void tocarVitoria() {
-  myDFPlayer.play(31);  // Arquivo 31 deve ser o som de vitória
+  myDFPlayer.play(31);
 }
 
 void reiniciarJogo() {
   estadoAtual = INICIO;
-  nivelAtual = 0;
   materiaSelecionada = 0;
   dificuldadeSelecionada = 0;
+  perguntaAtual = 0;
+  acertosConsecutivos = 0;
   tocarInstrucoesMateria();
-} 
+}
