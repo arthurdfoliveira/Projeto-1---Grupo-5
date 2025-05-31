@@ -5,7 +5,7 @@
 ## 🎥 Demonstrações
 
 Veja o BrainPop! em ação:
-![Captura de Tela](https://via.placeholder.com/800x400)  
+![Captura de Tela](https://via.placeholder.com/800x400/https://github.com/Berna0501/asd/blob/main/Captura%20de%20tela%202025-05-31%20110920.png)  
 📺 [Assista ao vídeo no YouTube](https://youtube.com/)
 
 ## ✨ Recursos & Funcionalidades
