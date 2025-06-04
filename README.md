@@ -18,11 +18,11 @@ Veja o BrainPop! em ação:
 ## 🎮 Como Usar
 
 1. **Escolha o tema:** Pressione os botões para selecionar entre Matemática, Ciências ou Conhecimentos Gerais.
-2. **Defina a dificuldade:**
+2. **Defina a categoria:**
    - 5 a 7 anos (Iniciante)
    - 8 a 10 anos (Intermediário)
    - 11 a 13 anos (Avançado)
-3. **Reproduza a sequência sonora:** Ouça e pressione os botões corretamente.
+3. **Reproduza a sequência sonora:** Ouça e pressione os botões corretamente (na categoria iniciante, não há sequência devido à faixa-etária).
 4. **Responda a pergunta:** Se acertar, avança de fase; desafios aumentam progressivamente!
 
 ## ⚙️ Componentes Utilizados
@@ -32,7 +32,6 @@ Este jogo foi desenvolvido utilizando:
 - 🔌 **Arduíno Uno**
 - 🎮 **3x Botões Fliperama**
 - 🔌 **Protoboard, Jumpers e Resistores**
-- 🔍 **Outros componentes eletrônicos**
 
 ## 📜 Objetivos do Jogo
 
