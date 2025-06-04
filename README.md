@@ -30,8 +30,6 @@ Veja o BrainPop! em ação:
 Este jogo foi desenvolvido utilizando:
 
 - 🔌 **Arduíno Uno**
-- 🎵 **Módulo MP3 DFPlayer**
-- 🎛 **Módulo Adaptador P2**
 - 🎮 **3x Botões Fliperama**
 - 🔌 **Protoboard, Jumpers e Resistores**
 - 🔍 **Outros componentes eletrônicos**
