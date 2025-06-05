@@ -1,158 +1,145 @@
-#include <SoftwareSerial.h>
-#include <DFRobotDFPlayerMini.h>
+import serial
+import time
+import random
+import os
+import pygame
 
-// ← CORREÇÃO AQUI: pinos onde seus botões estão realmente conectados
-#define BOTAO_A 7
-#define BOTAO_B 6
-#define BOTAO_C 5
+PORTA_SERIAL = 'COM3'
+BAUD_RATE = 9600
 
-SoftwareSerial mySerial(10, 11); // RX, TX do DFPlayer
-DFRobotDFPlayerMini player;
-
-int estado = 0;
-int materiaSelecionada = 0;
-int dificuldadeSelecionada = 0;
-int perguntaAtual = 0;
-
-// Gabarito com 90 respostas (1=A, 2=B, 3=C)
-int respostasCorretas[90] = {
-  1,2,3,1,2,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3,
-  1,1,2,2,3,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3,
-  1,2,3,1,2,3,1,2,3,1,  2,3,1,2,3,1,2,3,1,2,  3,1,2,3,1,2,3,1,2,3
-};
-
-void setup() {
-  Serial.begin(9600);
-  mySerial.begin(9600);
-
-  pinMode(BOTAO_A, INPUT_PULLUP);
-  pinMode(BOTAO_B, INPUT_PULLUP);
-  pinMode(BOTAO_C, INPUT_PULLUP);
-
-  if (!player.begin(mySerial)) {
-    Serial.println("Falha ao inicializar o DFPlayer");
-    while (true);
-  }
-  player.setTimeOut(500);
-  player.volume(20);
-
-  Serial.println("Iniciando o jogo...");
-  player.play(1); // 0001.mp3 - Boas-vindas
-  delay(43000);
-  estado = 1;
+botao_para_letra = {
+    'Y': 'A', 'Yellow': 'A',
+    'R': 'B', 'Red': 'B',
+    'G': 'C', 'Green': 'C'
 }
 
-void loop() {
-  switch (estado) {
-    case 1: // instruções de matéria
-      Serial.println("Tocando instruções para escolher a matéria...");
-      player.play(2); // 0002.mp3
-      delay(24000);
-      estado = 2;
-      break;
+indice_para_letra = ['A', 'B', 'C']
 
-    case 2: // seleciona matéria
-      Serial.println("Esperando seleção da matéria...");
-      if (botaoPressionado(BOTAO_A))  escolhaMateria(1, 11, "Matemática");
-      else if (botaoPressionado(BOTAO_B)) escolhaMateria(2, 12, "Ciências");
-      else if (botaoPressionado(BOTAO_C)) escolhaMateria(3, 13, "Conhecimentos Gerais");
-      break;
+pygame.init()
+pygame.mixer.init()
 
-    case 3: // instruções de dificuldade
-      Serial.println("Tocando instruções para escolher dificuldade...");
-      player.play(3); // 0003.mp3
-      delay(24000);
-      estado = 4;
-      break;
+def tocar(audio_path):
+    if not os.path.exists(audio_path):
+        print(f"[ERRO] Arquivo não encontrado: {audio_path}")
+        return
+    print(f"Tocando: {audio_path}")
+    pygame.mixer.music.load(audio_path)
+    pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
 
-    case 4: // seleciona dificuldade
-      Serial.println("Esperando seleção da dificuldade...");
-      if (botaoPressionado(BOTAO_A))  escolhaDificuldade(1, 11, "Fácil");
-      else if (botaoPressionado(BOTAO_B)) escolhaDificuldade(2, 12, "Média");
-      else if (botaoPressionado(BOTAO_C)) escolhaDificuldade(3, 13, "Difícil");
-      break;
+def aguardar_botao_com_repeticao(ser, repetir_funcao=None):
+    tempo_inicio = time.time()
+    while True:
+        if ser.in_waiting:
+            entrada = ser.readline().decode().strip().capitalize()
+            if entrada in botao_para_letra:
+                letra = botao_para_letra[entrada]
+                print(f"Botão pressionado: {entrada} = {letra}")
+                return letra
+        elif repetir_funcao and time.time() - tempo_inicio > 5:
+            print("[INFO] Tempo excedido. Repetindo áudio...")
+            repetir_funcao()
+            tempo_inicio = time.time()
 
-    case 5: // toca pergunta
-      if (perguntaAtual < 10) {
-        int idx = (materiaSelecionada - 1)*30 + (dificuldadeSelecionada - 1)*10 + perguntaAtual;
-        int faixa = 40 + idx;
-        Serial.print("Tocando pergunta ");
-        Serial.print(perguntaAtual + 1);
-        Serial.print(" (faixa ");
-        Serial.print(faixa);
-        Serial.println(")");
-        player.play(faixa);
-        delay(10000); // tempo para áudio da pergunta
-        estado = 6;
-      } else {
-        Serial.println("Todas as perguntas concluídas!");
-        player.play(31); // vitória
-        delay(3000);
-        estado = 7;
-      }
-      break;
+def escolher_com_botao(ser, lista, audio_instrucao):
+    def repetir(): tocar(audio_instrucao)
+    repetir()
+    print("Aguardando botão para escolha...")
+    while True:
+        botao = aguardar_botao_com_repeticao(ser, repetir)
+        if botao == 'A':
+            return lista[0]
+        elif botao == 'B':
+            return lista[1]
+        elif botao == 'C':
+            return lista[2]
 
-    case 6: // espera resposta
-      Serial.println("Esperando resposta...");
-      if (botaoPressionado(BOTAO_A)) verificaResposta(1);
-      else if (botaoPressionado(BOTAO_B)) verificaResposta(2);
-      else if (botaoPressionado(BOTAO_C)) verificaResposta(3);
-      break;
+def jogo():
+    ser = serial.Serial(PORTA_SERIAL, BAUD_RATE, timeout=1)
+    time.sleep(2)
 
-    case 7: // fim / reinício
-      Serial.println("Jogo encerrado. Reiniciando...");
-      perguntaAtual = 0;
-      estado = 1;
-      break;
-  }
-}
+    tocar("inicio/introdutorio.mp3")
 
-void escolhaMateria(int mat, int somBotao, const char* nome) {
-  materiaSelecionada = mat;
-  player.play(somBotao);
-  delay(1000);
-  Serial.print("Matéria escolhida: ");
-  Serial.println(nome);
-  estado = 3;
-}
+    materias = ["matematica", "ciencias", "geral"]
+    categorias = ["iniciante", "intermediario", "avancado"]
 
-void escolhaDificuldade(int dif, int somBotao, const char* nome) {
-  dificuldadeSelecionada = dif;
-  player.play(somBotao);
-  delay(1000);
-  Serial.print("Dificuldade: ");
-  Serial.println(nome);
-  perguntaAtual = 0;
-  estado = 5;
-}
+    materia = escolher_com_botao(ser, materias, "inicio/escolha_materia.mp3")
+    categoria = escolher_com_botao(ser, categorias, "inicio/escolha_categoria.mp3")
 
-void verificaResposta(int resp) {
-  int idx = (materiaSelecionada - 1)*30 + (dificuldadeSelecionada - 1)*10 + perguntaAtual;
-  Serial.print("Resposta recebida: ");
-  Serial.println(resp);
-  Serial.print("Resposta correta: ");
-  Serial.println(respostasCorretas[idx]);
-  if (resp == respostasCorretas[idx]) {
-    Serial.println("Resposta correta!");
-    perguntaAtual++;
-    estado = 5;
-  } else {
-    Serial.println("Resposta incorreta!");
-    player.play(30); // erro
-    delay(3000);
-    estado = 6;
-  }
-}
+    pasta_base = f"materia/{materia}/{categoria}"
+    sons_dir = os.path.join(pasta_base, "sons")
+    instrucoes_dir = os.path.join(pasta_base, "instrucoes_sons")
+    perguntas_dir = os.path.join(pasta_base, "perguntas")
+    respostas_dir = os.path.join(pasta_base, "respostas")
 
-// debounce + espera soltar
-bool botaoPressionado(int pino) {
-  if (digitalRead(pino) == LOW) {
-    delay(20);
-    if (digitalRead(pino) == LOW) {
-      while (digitalRead(pino) == LOW);
-      delay(20);
-      return true;
-    }
-  }
-  return false;
-}
+    if categoria in ["intermediario", "avancado"]:
+        instrucoes_com_sons = [
+            ("amarelo_instrucoes_som.mp3", "audio1.mp3"),
+            ("botao_vermelho.mp3", "audio2.mp3"),
+            ("c_botao_verde.mp3", "audio3.mp3")
+        ]
+
+        for instrucao, som in instrucoes_com_sons:
+            tocar(os.path.join(instrucoes_dir, instrucao))
+            time.sleep(0.3)
+            tocar(os.path.join(sons_dir, som))
+            time.sleep(0.3)
+
+    perguntas = sorted([f for f in os.listdir(perguntas_dir) if f.endswith(".mp3")])
+
+    tocar("inicio/cliquebotao.mp3")
+    aguardar_botao_com_repeticao(ser)
+
+    for nivel in range(10):
+        print(f"\n🔊 Nível {nivel + 1}")
+
+        if categoria in ["intermediario", "avancado"]:
+            qtd_sons = 3 if categoria == "intermediario" else 5
+            sequencia = [random.randint(0, 2) for _ in range(qtd_sons)]
+
+            def repetir_sequencia():
+                for i in sequencia:
+                    tocar(os.path.join(sons_dir, f"audio{i + 1}.mp3"))
+                    time.sleep(0.4)
+
+            print("Tocando sequência...")
+            repetir_sequencia()
+
+            print("Jogador deve repetir a sequência...")
+            for esperado in sequencia:
+                letra_esperada = indice_para_letra[esperado]
+                letra_jogador = aguardar_botao_com_repeticao(ser, repetir_sequencia)
+                print(f"Esperado: {letra_esperada}, Jogador: {letra_jogador}")
+                if letra_jogador != letra_esperada:
+                    tocar(os.path.join(respostas_dir, "incorreta.mp3"))
+                    print("Sequência errada. Fim de jogo.")
+                    return
+            print("Sequência correta!")
+
+        pergunta_audio = os.path.join(perguntas_dir, perguntas[nivel])
+
+        def repetir_pergunta():
+            tocar(pergunta_audio)
+
+        repetir_pergunta()
+
+        resposta_jogador = aguardar_botao_com_repeticao(ser, repetir_pergunta)
+        print(f"Resposta: {resposta_jogador}")
+
+        with open(os.path.join(respostas_dir, f"pergunta{nivel + 1}.txt")) as f:
+            resposta_correta = f.read().strip().upper()
+
+        if resposta_jogador == resposta_correta:
+            tocar(os.path.join(respostas_dir, "correta.mp3"))
+        else:
+            tocar(os.path.join(respostas_dir, "incorreta.mp3"))
+            print("Resposta errada. Fim de jogo.")
+            return
+
+    tocar(os.path.join(respostas_dir, "vitoria.mp3"))
+    print("\n🏆 Parabéns! Você completou todas as perguntas com sucesso!")
+    return
+
+if _name_ == "_main_":
+    jogo()
