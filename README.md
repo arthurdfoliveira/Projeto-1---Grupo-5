@@ -6,7 +6,7 @@
 
 Veja o BrainPop! em ação:
 ![Captura de Tela](https://via.placeholder.com/800x400)  
-📺 [Assista ao vídeo no YouTube]([(https://youtu.be/04k2_lUISoI?feature=shared)])
+📺 [Assista ao vídeo no YouTube](https://youtu.be/04k2_lUISoI?feature=shared)
 
 ## ✨ Recursos & Funcionalidades
 
