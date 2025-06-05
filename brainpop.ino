@@ -1,3 +1,5 @@
+Bibliotecas utilizadas: pyserial, time, random, os, pygame
+
 Código Phyton:
 
   
