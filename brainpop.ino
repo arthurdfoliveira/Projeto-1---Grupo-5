@@ -1,4 +1,4 @@
-**Código Phyton:**
+Código Phyton:
 
   
 import serial
