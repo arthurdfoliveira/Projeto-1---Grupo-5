@@ -4,7 +4,7 @@
 
 ## 🎥 Demonstrações
 
-Veja o BrainPop! em ação:
+👀 Veja o BrainPop! em ação:
 
 📺 [Assista ao vídeo no YouTube](https://youtu.be/04k2_lUISoI?feature=shared)
 
