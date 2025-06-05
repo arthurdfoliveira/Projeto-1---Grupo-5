@@ -15,7 +15,7 @@ Veja o BrainPop! em ação:
 - 🔊 Comandos sonoros e interface acessível
 - 👦 Público-alvo: crianças e jovens (acessível para todos)
 
-## 🎮 Como Usar
+## 🎮 Como Usarr
 
 1. **Escolha o tema:** Pressione os botões para selecionar entre Matemática, Ciências ou Conhecimentos Gerais.
 2. **Defina a categoria:**
