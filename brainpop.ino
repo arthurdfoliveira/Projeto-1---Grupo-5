@@ -150,7 +150,7 @@ if _name_ == "_main_":
 
 
 
-**Código C++:**
+Código C++:
 
 const int botaoAmarelo = 7;  
 const int botaoVermelho = 6; 
