@@ -46,7 +46,7 @@ Este jogo foi desenvolvido utilizando:
 - **Antonio Manoel Silva Lopes Gama** | [LinkedIn](https://br.linkedin.com/in/antonio-manoel-silva-lopes-gama-70533036a)
 - **Arthur da Fonte de Oliveira** | [LinkedIn](http://www.linkedin.com/in/arthur-da-fonte-de-oliveira-884496363)
 - **Bernardo Martins da Costa Pinto Filho** | [LinkedIn](https://www.linkedin.com/in/bernardomcpf)
-- **Filipe Correiaa Santos** | [LinkedIn](https://www.linkedin.com/in/filipecorreiasantos/)
+- **Filipe Correia Santos** | [LinkedIn](https://www.linkedin.com/in/filipecorreiasantos/)
 - **Gabriel Bezerra França Ribeiro** | [LinkedIn]()
 - **Giovanna Figueiredo de Azevedo** | [LinkedIn]()
 - **João Pedro Patriota de Carvalho** | [LinkedIn](https://www.linkedin.com/in/-joao-pedro)
